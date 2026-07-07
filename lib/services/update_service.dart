@@ -67,12 +67,34 @@ class UpdateService {
       return UpdateInfo(
         version: tag.replaceFirst(RegExp(r'^v'), ''),
         apkUrl: apkUrl,
-        notes: (data['body'] as String?)?.trim(),
+        notes: _cleanNotes(data['body'] as String?),
       );
     } catch (_) {
       // Errori di rete/parse non devono bloccare l'app.
       return null;
     }
+  }
+
+  /// Ripulisce le note di rilascio dal markdown e dalle righe tecniche
+  /// (es. "Full Changelog", link di confronto), per una lettura pulita.
+  static String? _cleanNotes(String? body) {
+    if (body == null) return null;
+    final lines = body.split('\n');
+    final out = <String>[];
+    for (var line in lines) {
+      final lower = line.toLowerCase();
+      if (lower.contains('full changelog')) continue;
+      if (lower.contains('github.com') && lower.contains('/compare/')) continue;
+      // Rimuove enfasi e simboli markdown.
+      line = line
+          .replaceAll(RegExp(r'[*_`]'), '')
+          .replaceFirst(RegExp(r'^\s*#{1,6}\s*'), '')
+          .replaceFirst(RegExp(r'^\s*[-*]\s+'), '• ')
+          .trimRight();
+      out.add(line);
+    }
+    final text = out.join('\n').trim();
+    return text.isEmpty ? null : text;
   }
 
   /// Converte una stringa di versione (es. "v1.2.3", "1.2.3+4") in una lista

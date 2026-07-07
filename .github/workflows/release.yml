@@ -53,9 +53,21 @@ jobs:
       - name: Rinomina APK
         run: cp build/app/outputs/flutter-apk/app-release.apk SerMaps-Driver.apk
 
+      - name: Estrai le note della versione dal CHANGELOG
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          awk -v tag="## ${TAG}" '
+            $0 == tag {f=1; next}
+            /^## / {f=0}
+            f {print}
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "Versione ${TAG}" > RELEASE_NOTES.md
+          fi
+
       - name: Pubblica la Release con l'APK
         uses: softprops/action-gh-release@v2
         with:
           name: SerMaps Driver ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
           files: SerMaps-Driver.apk
-          generate_release_notes: true
