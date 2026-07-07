@@ -862,11 +862,13 @@ class _HomeScreenState extends State<HomeScreen> {
       s.continuousHours = result.continuousHours;
       s.lunchStartMinutes = result.lunchStartMinutes;
       s.lunchEndMinutes = result.lunchEndMinutes;
+      s.openStartMinutes = result.openStartMinutes;
+      s.openEndMinutes = result.openEndMinutes;
     });
     await StorageService.saveStops(_stops);
-    // Se ora c'è una pausa pranzo e l'auto-ordina è attivo, riordina il giro
-    // per evitare di arrivare quando l'attività è chiusa.
-    if (_autoOptimize && s.hasLunchBreak && s.isPending) {
+    // Se ora ci sono orari del punto vendita e l'auto-ordina è attivo, riordina
+    // il giro per arrivare quando l'attività è aperta.
+    if (_autoOptimize && (s.hasHours || s.hasLunchBreak) && s.isPending) {
       await _recomputeRoute(reorder: true, silentFail: true);
     }
   }
@@ -1000,16 +1002,16 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (s.serviceType != ServiceType.none)
-            _infoChip(
-              Icons.build_circle_outlined,
+            _serviceBadge(
+              Icons.build_circle,
               s.serviceType.label,
               cs.primary,
             )
           else
-            _infoChip(
+            _serviceBadge(
               Icons.help_outline,
               'Non definito',
-              Colors.grey.shade600,
+              Colors.grey.shade500,
             ),
           if (s.note != null && s.note!.isNotEmpty) ...[
             const SizedBox(height: 4),
@@ -1045,6 +1047,40 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  /// Badge pieno e ben visibile per il tipo di intervento (LIS, IGT, ...).
+  Widget _serviceBadge(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(9),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.35),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Colors.white),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: 0.3,
+            ),
+          ),
         ],
       ),
     );
@@ -1518,7 +1554,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (points.isEmpty) return;
 
     if (points.length == 1) {
-      controller.animateCamera(CameraUpdate.newLatLngZoom(points.first, 13));
+      controller.animateCamera(CameraUpdate.newLatLngZoom(points.first, 15));
       return;
     }
 
@@ -1529,6 +1565,19 @@ class _HomeScreenState extends State<HomeScreen> {
       maxLat = p.latitude > maxLat ? p.latitude : maxLat;
       minLng = p.longitude < minLng ? p.longitude : minLng;
       maxLng = p.longitude > maxLng ? p.longitude : maxLng;
+    }
+    // Se i punti sono molto vicini tra loro, evita lo zoom eccessivo (che fa
+    // sembrare enorme il cerchio di precisione GPS): centra con zoom fisso.
+    final latSpan = maxLat - minLat;
+    final lngSpan = maxLng - minLng;
+    if (latSpan < 0.004 && lngSpan < 0.004) {
+      controller.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng((minLat + maxLat) / 2, (minLng + maxLng) / 2),
+          15.5,
+        ),
+      );
+      return;
     }
     controller.animateCamera(
       CameraUpdate.newLatLngBounds(
@@ -1754,6 +1803,7 @@ class _HomeScreenState extends State<HomeScreen> {
           myLocationButtonEnabled: false,
           zoomControlsEnabled: false,
           mapToolbarEnabled: false,
+          minMaxZoomPreference: const MinMaxZoomPreference(3, 17),
           style: isDark ? _mapStyleDark : _mapStyleLight,
           onMapCreated: (c) {
             _mapController = c;
@@ -2056,6 +2106,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(bottom: 12),
                     itemCount: _pendingStops.length,
                     onReorder: _reorderPending,
+                    // Rallenta lo scorrimento automatico durante il
+                    // trascinamento, cosi con molte tappe e piu preciso.
+                    autoScrollerVelocityScalar: 18,
                     itemBuilder: (context, i) {
                       final pending = _pendingStops;
                       return _buildStopTile(pending[i], i, pending.length);
@@ -2273,24 +2326,22 @@ class _HomeScreenState extends State<HomeScreen> {
             spacing: 6,
             runSpacing: 4,
             children: [
-              if (s.continuousHours)
+              if (s.isClosedOnArrival)
                 _infoChip(
-                  Icons.timelapse,
-                  'Orario continuato',
-                  Colors.green.shade700,
+                  Icons.block,
+                  'Chiuso all\'arrivo${s.hoursLabel != null ? ' · ${s.hoursLabel}' : ''}',
+                  Colors.red,
                 )
-              else if (s.hasLunchBreak)
+              else if (s.hasHours || s.hasLunchBreak || s.continuousHours)
                 _infoChip(
-                  s.isDuringLunch ? Icons.no_meals : Icons.lunch_dining,
-                  s.isDuringLunch
-                      ? 'Chiuso a pranzo ${s.lunchLabel}'
-                      : 'Pausa ${s.lunchLabel}',
-                  s.isDuringLunch ? Colors.red : Colors.orange.shade800,
+                  Icons.storefront,
+                  s.hoursLabel ?? 'Orari indicati',
+                  Colors.green.shade700,
                 )
               else
                 _infoChip(
-                  Icons.lunch_dining,
-                  'Pausa non definita',
+                  Icons.schedule,
+                  'Orari non definiti',
                   Colors.grey.shade600,
                 ),
             ],
@@ -2545,7 +2596,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           s.serviceType == ServiceType.none &&
                                   (s.note == null || s.note!.isEmpty) &&
                                   !s.continuousHours &&
-                                  !s.hasLunchBreak
+                                  !s.hasLunchBreak &&
+                                  !s.hasHours
                               ? 'Dettagli / note'
                               : 'Modifica dettagli / note',
                         ),

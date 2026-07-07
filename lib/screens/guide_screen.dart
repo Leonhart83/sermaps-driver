@@ -44,8 +44,9 @@ class GuideScreen extends StatelessWidget {
             title: 'Dettagli intervento',
             body:
                 'Appena scegli un indirizzo, l\'app chiede il tipo di intervento '
-                '(LIS, IGT, SISAL, TLC, GBO, GLOBAL), eventuali note e la pausa '
-                'pranzo del punto (orario continuato oppure orari di chiusura). '
+                '(LIS, IGT, SISAL, TLC, GBO, GLOBAL), eventuali note e gli orari '
+                'del punto vendita (apertura, chiusura e pausa pranzo, oppure '
+                'orario continuato). '
                 'Puoi premere "Salta": resterà segnato come "Non definito" e '
                 'potrai completarlo più tardi dal menu ⋮ → "Dettagli / note". '
                 'Tipo e nota compaiono in alto a destra sulla tappa.',
@@ -66,8 +67,10 @@ class GuideScreen extends StatelessWidget {
             title: 'Ordinare e gestire',
             bullets: const [
               'Auto-ordina: riordina partendo dalla tappa più vicina a te e, se '
-                  'hai indicato le pause pranzo, evita di farti arrivare quando il '
-                  'punto è chiuso, rimandandolo dopo la riapertura.',
+                  'hai indicato gli orari dei punti vendita, ti porta a ogni '
+                  'negozio quando è aperto, rimandando le tappe a cui arriveresti '
+                  'a negozio chiuso (prima dell\'apertura, in pausa o dopo la '
+                  'chiusura).',
               'Trascina una tappa (icona ☰) per spostarla a mano.',
               'Menu ⋮ su ogni tappa: sposta, blocca come prima/ultima, imposta '
                   'orario, dettagli/note, apri in Maps, elimina.',

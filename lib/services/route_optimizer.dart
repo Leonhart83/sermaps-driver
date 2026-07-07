@@ -96,11 +96,11 @@ class RouteOptimizer {
         // (se presente), altrimenti dalla posizione attuale.
         final fromLat = pinnedFirst.isNotEmpty ? pinnedFirst.last.lat : startLat;
         final fromLng = pinnedFirst.isNotEmpty ? pinnedFirst.last.lng : startLng;
-        // Se è nota l'ora e almeno una tappa ha una pausa pranzo, usa il
+        // Se è nota l'ora e almeno una tappa ha orari (apertura/pausa), usa il
         // nearest-neighbor che tiene conto degli orari (evita di arrivare
         // quando l'attività è chiusa). Altrimenti quello classico spaziale.
         final useTimeAware =
-            nowMinutes != null && middle.any((s) => s.hasLunchBreak);
+            nowMinutes != null && middle.any((s) => s.hasHours || s.hasLunchBreak);
         final orderedMiddle = useTimeAware
             ? _nearestNeighborTimeAware(middle, fromLat, fromLng, nowMinutes)
             : _nearestNeighbor(middle, fromLat, fromLng);
@@ -168,10 +168,9 @@ class RouteOptimizer {
   /// Tempo di servizio stimato per ogni tappa (minuti).
   static const int _serviceMinutes = 5;
 
-  /// True se la tappa risulta chiusa (pausa pranzo) all'orario [minutes].
+  /// True se la tappa risulta chiusa (orari/pausa) all'orario [minutes].
   static bool _isClosedAt(Stop s, double minutes) {
-    if (s.continuousHours || !s.hasLunchBreak) return false;
-    return minutes >= s.lunchStartMinutes! && minutes < s.lunchEndMinutes!;
+    return !s.isOpenAt(minutes.round());
   }
 
   /// Nearest-neighbor consapevole degli orari: a ogni passo preferisce la

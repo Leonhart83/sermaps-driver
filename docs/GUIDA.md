@@ -98,18 +98,18 @@ Appena scegli un indirizzo, l'app apre il foglio **"Dettagli intervento"** e chi
 - **Tipo di intervento**: LIS, IGT, SISAL, TLC, GBO, GLOBAL.
 - **Note** libere (es. citofonare, referente).
 - **Pausa pranzo**: interruttore _Orario continuato_ oppure gli orari di chiusura.
-
-Puoi premere **Salta**: la tappa resta **"Non definito"** e potrai completarla in
-seguito dal **menu ⋮ → Dettagli / note**. Il tipo e la nota compaiono in alto a
-destra sulla tappa; la pausa è mostrata con un'etichetta colorata.
+  Puoi premere **Salta**: la tappa resta **"Non definito"** e potrai completarla in
+  seguito dal **menu ⋮ → Dettagli / note**. Il tipo e la nota compaiono in alto a
+  destra sulla tappa; la pausa è mostrata con un'etichetta colorata.
 
 ---
 
 ## 5. Ordinare e gestire le tappe
 
 - **Auto-ordina**: riordina partendo dalla tappa più vicina a te. Se hai indicato
-  le **pause pranzo**, evita di farti arrivare quando il punto è chiuso,
-  rimandandolo dopo la riapertura.
+  gli **orari dei punti vendita**, ti porta a ogni negozio **quando è aperto**,
+  rimandando le tappe a cui arriveresti a saracinesca abbassata (prima
+  dell'apertura, in pausa pranzo o dopo la chiusura).
 - **Sposta a mano**: trascina con l'icona ☰ (disattiva l'auto-ordina).
 - **Menu ⋮**: sposta, blocca come prima/ultima, imposta orario, **dettagli / note**,
   apri in Maps, consegna non riuscita, elimina.

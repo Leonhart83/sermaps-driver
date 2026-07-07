@@ -3,6 +3,19 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.3
+
+- Orari dei punti vendita: per ogni tappa puoi indicare apertura, chiusura ed
+  eventuale pausa pranzo. L'auto-ordina ti porta a ogni negozio quando è aperto
+  e rimanda le tappe a cui arriveresti a saracinesca abbassata.
+- Sulla tappa un badge mostra gli orari, "Chiuso all'arrivo" (in rosso) o
+  "Orari non definiti".
+- Badge del tipo intervento (LIS, IGT, ...) più visibile (pieno e colorato).
+- Mappa più leggibile: strade con contorni, arterie evidenziate e la tua
+  posizione ora ben distinguibile (niente più zoom eccessivo).
+- Spostamento manuale delle tappe più preciso con liste lunghe (scorrimento più
+  lento durante il trascinamento).
+
 ## v1.1.2
 
 - L'avviso di aggiornamento non compare più a ogni avvio: se scegli "Più tardi"

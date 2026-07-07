@@ -80,6 +80,12 @@ class Stop {
   /// Fine pausa pranzo (minuti dalla mezzanotte), se non è orario continuato.
   int? lunchEndMinutes;
 
+  /// Orario di apertura del punto vendita (minuti dalla mezzanotte).
+  int? openStartMinutes;
+
+  /// Orario di chiusura del punto vendita (minuti dalla mezzanotte).
+  int? openEndMinutes;
+
   /// Orario di arrivo stimato (ETA) in minuti dalla mezzanotte. Transiente.
   int? etaMinutes;
 
@@ -121,6 +127,49 @@ class Stop {
       etaMinutes! >= lunchStartMinutes! &&
       etaMinutes! < lunchEndMinutes!;
 
+  /// True se sono stati indicati gli orari di apertura/chiusura.
+  bool get hasHours => openStartMinutes != null && openEndMinutes != null;
+
+  /// True se sono state indicate informazioni sugli orari (apertura o pausa).
+  bool get hasAnyHours => hasHours || hasLunchBreak || continuousHours;
+
+  /// True se il punto vendita risulta aperto all'orario [m] (minuti dalla
+  /// mezzanotte), in base a orari di apertura ed eventuale pausa pranzo.
+  /// Se non sono noti orari, si assume sempre aperto.
+  bool isOpenAt(int m) {
+    if (hasHours && (m < openStartMinutes! || m >= openEndMinutes!)) {
+      return false;
+    }
+    if (hasLunchBreak &&
+        m >= lunchStartMinutes! &&
+        m < lunchEndMinutes!) {
+      return false;
+    }
+    return true;
+  }
+
+  /// True se l'arrivo stimato cade quando il punto vendita è chiuso.
+  bool get isClosedOnArrival =>
+      etaMinutes != null &&
+      (hasHours || hasLunchBreak) &&
+      !isOpenAt(etaMinutes!);
+
+  /// Etichetta leggibile degli orari (es. "8:30-13:00 · 15:00-19:30").
+  String? get hoursLabel {
+    if (hasHours && hasLunchBreak) {
+      return '${formatMinutes(openStartMinutes!)}-${formatMinutes(lunchStartMinutes!)}'
+          ' · ${formatMinutes(lunchEndMinutes!)}-${formatMinutes(openEndMinutes!)}';
+    }
+    if (hasHours) {
+      return '${formatMinutes(openStartMinutes!)}-${formatMinutes(openEndMinutes!)}';
+    }
+    if (hasLunchBreak) {
+      return 'pausa ${formatMinutes(lunchStartMinutes!)}-${formatMinutes(lunchEndMinutes!)}';
+    }
+    if (continuousHours) return 'orario continuato';
+    return null;
+  }
+
   /// True se la tappa è ancora da consegnare.
   bool get isPending => status == StopStatus.pending;
 
@@ -151,6 +200,8 @@ class Stop {
     this.continuousHours = false,
     this.lunchStartMinutes,
     this.lunchEndMinutes,
+    this.openStartMinutes,
+    this.openEndMinutes,
     this.lat,
     this.lng,
     this.city,
@@ -171,6 +222,8 @@ class Stop {
         'continuousHours': continuousHours,
         'lunchStartMinutes': lunchStartMinutes,
         'lunchEndMinutes': lunchEndMinutes,
+        'openStartMinutes': openStartMinutes,
+        'openEndMinutes': openEndMinutes,
         'lat': lat,
         'lng': lng,
         'city': city,
@@ -200,6 +253,8 @@ class Stop {
         continuousHours: json['continuousHours'] as bool? ?? false,
         lunchStartMinutes: (json['lunchStartMinutes'] as num?)?.toInt(),
         lunchEndMinutes: (json['lunchEndMinutes'] as num?)?.toInt(),
+        openStartMinutes: (json['openStartMinutes'] as num?)?.toInt(),
+        openEndMinutes: (json['openEndMinutes'] as num?)?.toInt(),
         lat: (json['lat'] as num?)?.toDouble(),
         lng: (json['lng'] as num?)?.toDouble(),
         city: json['city'] as String?,

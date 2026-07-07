@@ -9,6 +9,8 @@ class StopDetailsResult {
   final bool continuousHours;
   final int? lunchStartMinutes;
   final int? lunchEndMinutes;
+  final int? openStartMinutes;
+  final int? openEndMinutes;
 
   const StopDetailsResult({
     required this.serviceType,
@@ -16,6 +18,8 @@ class StopDetailsResult {
     required this.continuousHours,
     required this.lunchStartMinutes,
     required this.lunchEndMinutes,
+    required this.openStartMinutes,
+    required this.openEndMinutes,
   });
 }
 
@@ -38,6 +42,8 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
   late bool _continuous;
   int? _lunchStart;
   int? _lunchEnd;
+  int? _openStart;
+  int? _openEnd;
 
   @override
   void initState() {
@@ -47,6 +53,8 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
     _continuous = widget.stop.continuousHours;
     _lunchStart = widget.stop.lunchStartMinutes;
     _lunchEnd = widget.stop.lunchEndMinutes;
+    _openStart = widget.stop.openStartMinutes;
+    _openEnd = widget.stop.openEndMinutes;
   }
 
   @override
@@ -76,6 +84,27 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
     });
   }
 
+  Future<void> _pickOpen({required bool start}) async {
+    final current = start ? _openStart : _openEnd;
+    final initial = current != null
+        ? TimeOfDay(hour: current ~/ 60, minute: current % 60)
+        : TimeOfDay(hour: start ? 8 : 19, minute: start ? 30 : 0);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      helpText: start ? 'Apertura alle' : 'Chiusura alle',
+    );
+    if (picked == null) return;
+    setState(() {
+      final minutes = picked.hour * 60 + picked.minute;
+      if (start) {
+        _openStart = minutes;
+      } else {
+        _openEnd = minutes;
+      }
+    });
+  }
+
   void _save() {
     Navigator.of(context).pop(
       StopDetailsResult(
@@ -86,6 +115,8 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
         continuousHours: _continuous,
         lunchStartMinutes: _continuous ? null : _lunchStart,
         lunchEndMinutes: _continuous ? null : _lunchEnd,
+        openStartMinutes: _openStart,
+        openEndMinutes: _openEnd,
       ),
     );
   }
@@ -194,9 +225,56 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
               ),
               const SizedBox(height: 22),
 
-              // Orari
-              _sectionHeader(Icons.lunch_dining, 'Pausa pranzo'),
-              const SizedBox(height: 4),
+              // Orari di apertura del punto vendita
+              _sectionHeader(Icons.storefront, 'Orari punto vendita'),
+              const SizedBox(height: 8),
+              Text(
+                'Apertura e chiusura (per far arrivare il giro quando è aperto)',
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.login, size: 18),
+                      label: Text(
+                        _openStart == null
+                            ? 'Apertura'
+                            : Stop.formatMinutes(_openStart!),
+                      ),
+                      onPressed: () => _pickOpen(start: true),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.logout, size: 18),
+                      label: Text(
+                        _openEnd == null
+                            ? 'Chiusura'
+                            : Stop.formatMinutes(_openEnd!),
+                      ),
+                      onPressed: () => _pickOpen(start: false),
+                    ),
+                  ),
+                ],
+              ),
+              if (_openStart != null || _openEnd != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.clear, size: 18),
+                    label: const Text('Rimuovi orari'),
+                    onPressed: () => setState(() {
+                      _openStart = null;
+                      _openEnd = null;
+                    }),
+                  ),
+                ),
+              const SizedBox(height: 16),
+
+              // Pausa pranzo
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Orario continuato'),
@@ -207,7 +285,7 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
               if (!_continuous) ...[
                 const SizedBox(height: 4),
                 Text(
-                  'Indica quando chiude per pranzo',
+                  'Chiusura per pranzo',
                   style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
@@ -215,7 +293,7 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        icon: const Icon(Icons.schedule, size: 18),
+                        icon: const Icon(Icons.lunch_dining, size: 18),
                         label: Text(
                           _lunchStart == null
                               ? 'Dalle'
@@ -227,7 +305,7 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton.icon(
-                        icon: const Icon(Icons.schedule, size: 18),
+                        icon: const Icon(Icons.lunch_dining, size: 18),
                         label: Text(
                           _lunchEnd == null
                               ? 'Alle'
