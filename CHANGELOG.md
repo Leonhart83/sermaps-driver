@@ -3,6 +3,13 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.9
+
+- Quando è disponibile un aggiornamento, l'app richiede il permesso "Installa
+  app sconosciute" (aprendo la schermata di sistema) se non è ancora concesso,
+  così l'installazione automatica può completarsi. Una volta concesso, gli
+  aggiornamenti si installano da soli senza altre richieste.
+
 ## v1.1.8
 
 - Correzione: l'aggiornamento automatico viene ora tentato una sola volta per

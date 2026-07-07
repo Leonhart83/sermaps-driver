@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -142,25 +143,62 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Verifica gli aggiornamenti su GitHub e, se è disponibile una versione più
-  /// recente, la scarica e installa automaticamente all'avvio, senza chiedere
-  /// conferma. (Il prompt finale di installazione è quello di sistema Android
-  /// e non può essere evitato.)
+  /// recente, la scarica e installa automaticamente all'avvio.
   ///
-  /// L'aggiornamento automatico viene tentato UNA sola volta per versione: se
-  /// l'installazione non viene completata (prompt di sistema annullato, permesso
-  /// "installa app sconosciute" non concesso, ecc.) l'app non riprova a ogni
-  /// avvio, evitando il loop. Resta comunque il download manuale dal sito.
+  /// Prima dell'installazione richiede il permesso "Installa app sconosciute"
+  /// (necessario ad Android per installare l'APK): finché non è concesso, la
+  /// richiesta viene riproposta a ogni aggiornamento. Una volta concesso,
+  /// l'aggiornamento è automatico e viene installato una sola volta per versione
+  /// (nessun loop). Il prompt finale di installazione è quello di sistema.
   Future<void> _checkForUpdate() async {
     final info = await UpdateService.checkForUpdate();
     if (!mounted || info == null) return;
-    // Evita il loop: non ritentare la stessa versione già gestita in automatico.
+    // Per installare l'APK serve il permesso "Installa app sconosciute": se
+    // manca, lo chiediamo aprendo la schermata di sistema. Finché non è
+    // concesso non segniamo la versione come gestita, così alla prossima
+    // apertura riproporremo di attivarlo.
+    final canInstall = await _ensureInstallPermission(info.version);
+    if (!mounted || !canInstall) return;
+    // Evita il loop: non reinstallare la stessa versione già gestita.
     final handled = await StorageService.getSkippedUpdateVersion();
-    if (!mounted || handled == info.version) return;
-    // Segna la versione come già tentata PRIMA del download/installazione.
+    if (handled == info.version) return;
     await StorageService.setSkippedUpdateVersion(info.version);
     if (!mounted) return;
     _showSnack('Aggiornamento ${info.version}: download in corso…');
     await _downloadAndInstall(info);
+  }
+
+  /// Verifica il permesso "Installa app sconosciute" e, se non concesso, mostra
+  /// una spiegazione e apre la schermata di sistema per attivarlo.
+  /// Restituisce true se il permesso è (o diventa) concesso.
+  Future<bool> _ensureInstallPermission(String version) async {
+    if (await Permission.requestInstallPackages.isGranted) return true;
+    if (!mounted) return false;
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.security, size: 32),
+        title: const Text('Consenti l\'installazione'),
+        content: Text(
+          'È disponibile la versione $version. Per installare gli aggiornamenti '
+          'automaticamente, Android deve poter installare da questa app.\n\n'
+          'Alla prossima schermata attiva "Consenti da questa origine".',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Non ora'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Apri impostazioni'),
+          ),
+        ],
+      ),
+    );
+    if (proceed != true) return false;
+    final result = await Permission.requestInstallPackages.request();
+    return result.isGranted;
   }
 
   /// Apre la pagina delle release su GitHub (fallback allo scaricamento manuale).
