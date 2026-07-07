@@ -124,6 +124,9 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    // Spazio occupato dalla barra di navigazione di sistema: va aggiunto sotto
+    // ai pulsanti, altrimenti restano nascosti/difficili da toccare.
+    final bottomSafe = MediaQuery.of(context).padding.bottom;
     final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -135,7 +138,7 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
         builder: (context, scrollController) {
           return ListView(
             controller: scrollController,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 24 + bottomSafe),
             children: [
               Center(
                 child: Container(
@@ -336,6 +339,9 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 52),
+                        ),
                         child: const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8),
                           child: Text('Salta'),
@@ -348,6 +354,9 @@ class _StopDetailsSheetState extends State<StopDetailsSheet> {
                     flex: 2,
                     child: FilledButton.icon(
                       onPressed: _save,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(0, 52),
+                      ),
                       icon: const Icon(Icons.check, size: 20),
                       label: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),

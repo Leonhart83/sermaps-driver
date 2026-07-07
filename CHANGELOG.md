@@ -3,6 +3,12 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.11
+
+- Correzione: nel foglio "Dettagli intervento" i pulsanti "Salta" e "Conferma"
+  non finiscono più dietro la barra di navigazione di sistema (aggiunto margine
+  di sicurezza) e sono più alti, quindi più visibili e facili da toccare.
+
 ## v1.1.10
 
 - Manutenzione e verifica del flusso di aggiornamento automatico con richiesta
