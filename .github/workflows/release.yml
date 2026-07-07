@@ -21,7 +21,9 @@ jobs:
       - name: Allinea la versione al tag (pubspec + docs)
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          BUILD="${GITHUB_RUN_NUMBER}"
+          # versionCode monotòno derivato dalla versione: MAJOR*10000 + MINOR*100 + PATCH
+          IFS='.' read -r MA MI PA <<< "$VERSION"
+          BUILD=$(( ${MA:-0} * 10000 + ${MI:-0} * 100 + ${PA:-0} ))
           # pubspec.yaml: la versione dell'app segue il tag (build incrementale)
           sed -i -E "s/^version:.*/version: ${VERSION}+${BUILD}/" pubspec.yaml
           # Documentazione: allinea i riferimenti di versione
@@ -88,7 +90,8 @@ jobs:
       - name: Salva la versione allineata sul repository
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          BUILD="${GITHUB_RUN_NUMBER}"
+          IFS='.' read -r MA MI PA <<< "$VERSION"
+          BUILD=$(( ${MA:-0} * 10000 + ${MI:-0} * 100 + ${PA:-0} ))
           DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

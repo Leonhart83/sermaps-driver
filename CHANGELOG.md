@@ -3,6 +3,12 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.7
+
+- Correzione del numero di build (versionCode) generato dalla pipeline: ora è
+  ricavato dalla versione ed è sempre crescente, evitando che un aggiornamento
+  venga rifiutato da Android come "downgrade".
+
 ## v1.1.6
 
 - Correzione dettatura vocale: la lingua italiana viene ora scelta tra quelle
