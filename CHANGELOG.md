@@ -3,6 +3,11 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.10
+
+- Manutenzione e verifica del flusso di aggiornamento automatico con richiesta
+  del permesso "Installa app sconosciute".
+
 ## v1.1.9
 
 - Quando è disponibile un aggiornamento, l'app richiede il permesso "Installa
