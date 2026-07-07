@@ -3,6 +3,12 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.13
+
+- Pannello delle tappe con tre posizioni tramite la maniglia in alto: chiuso
+  (mappa a tutto schermo), bilanciato ed esteso. Trascina la maniglia in su per
+  ingrandire la lista, in giù per chiuderla; da chiuso, tocca per riaprire.
+
 ## v1.1.12
 
 - Il pannello delle tappe si apre di più (la mappa occupa meno spazio), così

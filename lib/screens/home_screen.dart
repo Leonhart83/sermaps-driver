@@ -35,6 +35,12 @@ import '../widgets/stop_details_sheet.dart';
 import 'guide_screen.dart';
 import 'onboarding_screen.dart';
 
+/// Stato di apertura del pannello delle tappe:
+/// - [mapFull]: pannello chiuso, la mappa occupa quasi tutto lo schermo;
+/// - [balanced]: mappa e lista bilanciate (predefinito);
+/// - [listFull]: mappa ridotta al minimo, lista tappe al massimo.
+enum _PaneMode { mapFull, balanced, listFull }
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -61,8 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Ordina automaticamente le tappe in base alla mia posizione.
   bool _autoOptimize = true;
 
-  /// Riduce la mappa per dare piu spazio alla lista delle tappe.
-  bool _mapCollapsed = false;
+  /// Apertura del pannello tappe: chiuso (mappa piena), bilanciato o esteso.
+  _PaneMode _paneMode = _PaneMode.balanced;
 
   /// Stili mappa (caricati da asset) per tema chiaro/scuro.
   String? _mapStyleLight;
@@ -1814,9 +1820,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final mapH = _mapCollapsed
-                    ? 130.0
-                    : constraints.maxHeight * 0.38;
+                final mapH = switch (_paneMode) {
+                  _PaneMode.listFull => 130.0,
+                  _PaneMode.balanced => constraints.maxHeight * 0.38,
+                  _PaneMode.mapFull => (constraints.maxHeight - 64)
+                      .clamp(0.0, constraints.maxHeight),
+                };
                 return Column(
                   children: [
                     AnimatedContainer(
@@ -2054,6 +2063,63 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Apre di piu il pannello (trascinamento verso l'alto o riapertura).
+  void _paneMore() {
+    setState(() {
+      _paneMode = switch (_paneMode) {
+        _PaneMode.mapFull => _PaneMode.balanced,
+        _PaneMode.balanced => _PaneMode.listFull,
+        _PaneMode.listFull => _PaneMode.listFull,
+      };
+    });
+  }
+
+  /// Chiude il pannello un passo alla volta (trascinamento verso il basso).
+  void _paneLess() {
+    setState(() {
+      _paneMode = switch (_paneMode) {
+        _PaneMode.listFull => _PaneMode.balanced,
+        _PaneMode.balanced => _PaneMode.mapFull,
+        _PaneMode.mapFull => _PaneMode.mapFull,
+      };
+    });
+  }
+
+  /// Tocco sulla maniglia: alterna bilanciato/esteso; se chiuso, riapre.
+  void _cyclePaneOpen() {
+    setState(() {
+      _paneMode = _paneMode == _PaneMode.listFull
+          ? _PaneMode.balanced
+          : _PaneMode.listFull;
+    });
+  }
+
+  /// Header compatto mostrato quando il pannello e chiuso (mappa piena):
+  /// mostra il conteggio e permette di riaprire con un tocco.
+  Widget _collapsedPanelHeader() {
+    return InkWell(
+      onTap: () => setState(() => _paneMode = _PaneMode.balanced),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 14, 12),
+        child: Row(
+          children: [
+            Text(
+              'Da fare (${_pendingStops.length})',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'tocca per aprire',
+              style: TextStyle(fontSize: 12.5, color: Colors.grey[600]),
+            ),
+            const Spacer(),
+            Icon(Icons.keyboard_arrow_up, color: Colors.grey[600]),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildStopsPanel() {
     final cs = Theme.of(context).colorScheme;
     return Container(
@@ -2069,13 +2135,13 @@ class _HomeScreenState extends State<HomeScreen> {
           // Maniglia: tocca o trascina per espandere/chiudere il pannello.
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => setState(() => _mapCollapsed = !_mapCollapsed),
+            onTap: _cyclePaneOpen,
             onVerticalDragEnd: (d) {
               final v = d.primaryVelocity ?? 0;
               if (v < -50) {
-                setState(() => _mapCollapsed = true);
+                _paneMore(); // trascina su: apri di piu la lista
               } else if (v > 50) {
-                setState(() => _mapCollapsed = false);
+                _paneLess(); // trascina giu: chiudi il pannello
               }
             },
             child: Container(
@@ -2093,6 +2159,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          if (_paneMode == _PaneMode.mapFull)
+            _collapsedPanelHeader()
+          else ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 14, 0),
             child: Row(
@@ -2161,6 +2230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
           ),
+          ],
         ],
       ),
     );
