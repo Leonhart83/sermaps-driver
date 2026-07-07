@@ -8,13 +8,15 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Legge la chiave Google Maps da local.properties (non versionata)
+// Legge la chiave Google Maps da local.properties (non versionata) oppure,
+// in mancanza (es. build CI), dalla variabile d'ambiente MAPS_API_KEY.
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
-val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+val mapsApiKey: String =
+    localProperties.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY") ?: ""
 
 // Legge la configurazione di firma release da key.properties (non versionata)
 val keystoreProperties = Properties()
