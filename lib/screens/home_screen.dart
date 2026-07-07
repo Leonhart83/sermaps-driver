@@ -138,6 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _checkForUpdate() async {
     final info = await UpdateService.checkForUpdate();
     if (!mounted || info == null) return;
+    // Non richiedere di nuovo una versione che l'utente ha già rimandato.
+    final skipped = await StorageService.getSkippedUpdateVersion();
+    if (!mounted || skipped == info.version) return;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -173,6 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     if (confirm == true && mounted) {
       await _downloadAndInstall(info);
+    } else {
+      // "Più tardi": non richiedere più questa stessa versione.
+      await StorageService.setSkippedUpdateVersion(info.version);
     }
   }
 

@@ -53,4 +53,18 @@ class StorageService {
         : DateTime.fromMillisecondsSinceEpoch(startMs);
     return (meters, start);
   }
+
+  static const _skippedUpdateKey = 'skipped_update_version_v1';
+
+  /// Versione di aggiornamento che l'utente ha scelto di rimandare ("Più tardi").
+  static Future<String?> getSkippedUpdateVersion() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_skippedUpdateKey);
+  }
+
+  /// Ricorda una versione rimandata (per non richiederla a ogni avvio).
+  static Future<void> setSkippedUpdateVersion(String version) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_skippedUpdateKey, version);
+  }
 }

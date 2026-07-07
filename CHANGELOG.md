@@ -3,6 +3,14 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.2
+
+- L'avviso di aggiornamento non compare più a ogni avvio: se scegli "Più tardi"
+  quella versione non viene più richiesta (finché non ne esce una più nuova).
+- Note di aggiornamento più leggibili nell'avviso in-app (rimosse formattazione
+  markdown e righe tecniche); le descrizioni delle Release ora arrivano dal
+  CHANGELOG del progetto.
+
 ## v1.1.1
 
 - Manutenzione: prima release pubblicata automaticamente dalla pipeline
