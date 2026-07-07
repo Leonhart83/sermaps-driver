@@ -9,11 +9,6 @@ automaticamente come descrizione della Release su GitHub.
   non finiscono più dietro la barra di navigazione di sistema (aggiunto margine
   di sicurezza) e sono più alti, quindi più visibili e facili da toccare.
 
-## v1.1.10
-
-- Manutenzione e verifica del flusso di aggiornamento automatico con richiesta
-  del permesso "Installa app sconosciute".
-
 ## v1.1.9
 
 - Quando è disponibile un aggiornamento, l'app richiede il permesso "Installa
