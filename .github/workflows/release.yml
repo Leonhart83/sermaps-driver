@@ -96,7 +96,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin "$DEFAULT_BRANCH"
-          git checkout "$DEFAULT_BRANCH"
+          # -f: scarta le modifiche del working tree fatte in fase di build
+          # (vengono comunque riapplicate qui sotto con sed sul branch).
+          git checkout -f "$DEFAULT_BRANCH"
           sed -i -E "s/^version:.*/version: ${VERSION}+${BUILD}/" pubspec.yaml
           sed -i -E "s/Versione [0-9]+\.[0-9]+\.[0-9]+/Versione ${VERSION}/g" docs/GUIDA.html
           sed -i -E "s/Manuale d'uso v[0-9]+\.[0-9]+\.[0-9]+/Manuale d'uso v${VERSION}/g" docs/GUIDA.html
