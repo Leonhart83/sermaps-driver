@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="it">
+
+    <head>
+        <meta charset="utf-8">
+        <title>SerMaps Driver — Manuale d'uso</title>
+        <style>
+            :root {
+                --blue: #1A73E8;
+                --blue-d: #1557b0;
+                --ink: #1b2330;
+                --muted: #647082;
+                --line: #e7ebf2;
+                --soft: #f4f7fb;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: "Segoe UI", Inter, Roboto, Arial, sans-serif;
+                color: var(--ink);
+                line-height: 1.62;
+                font-size: 13px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            p {
+                margin: 7px 0;
+            }
+
+            ul,
+            ol {
+                margin: 8px 0;
+                padding-left: 20px;
+            }
+
+            li {
+                margin: 5px 0;
+            }
+
+            code {
+                background: #eef1f6;
+                padding: 1px 6px;
+                border-radius: 5px;
+                font-size: 12px;
+            }
+
+            /* ===== COPERTINA ===== */
+            .cover {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                background: radial-gradient(120% 80% at 50% 20%, #18335a 0%, #0e1116 60%);
+                color: #fff;
+                padding: 48px;
+                page-break-after: always;
+            }
+
+            .cover .logo {
+                width: 148px;
+                height: 148px;
+                border-radius: 34px;
+                margin-bottom: 32px;
+                box-shadow: 0 0 70px rgba(26, 115, 232, .5);
+            }
+
+            .cover h1 {
+                font-size: 46px;
+                margin: 0;
+                letter-spacing: .5px;
+                font-weight: 800;
+            }
+
+            .cover .sub {
+                color: #b8c4d6;
+                font-size: 19px;
+                margin-top: 10px;
+                font-weight: 500;
+            }
+
+            .cover .pill {
+                margin-top: 36px;
+                padding: 10px 22px;
+                border: 1px solid rgba(255, 255, 255, .22);
+                border-radius: 30px;
+                color: #dbe5f2;
+                font-size: 13.5px;
+                letter-spacing: .3px;
+            }
+
+            .cover .meta {
+                position: absolute;
+                bottom: 60px;
+                color: #8a97a8;
+                font-size: 13px;
+            }
+
+            .cover .author {
+                color: #fff;
+                font-weight: 700;
+                font-size: 15px;
+                display: block;
+                margin-top: 4px;
+            }
+
+            /* ===== PAGINA / SEZIONI ===== */
+            .page {
+                padding: 30px 46px;
+                page-break-before: always;
+            }
+
+            .page.toc {}
+
+            .sec-head {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                margin-bottom: 6px;
+            }
+
+            .sec-num {
+                width: 40px;
+                height: 40px;
+                flex: 0 0 40px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, var(--blue), var(--blue-d));
+                color: #fff;
+                font-size: 19px;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 12px rgba(26, 115, 232, .32);
+            }
+
+            .sec-title {
+                font-size: 22px;
+                font-weight: 800;
+                color: var(--ink);
+            }
+
+            .sec-rule {
+                height: 3px;
+                background: linear-gradient(90deg, var(--blue), transparent);
+                border-radius: 3px;
+                margin: 8px 0 18px;
+            }
+
+            .kicker {
+                color: var(--blue);
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 1.4px;
+                font-weight: 800;
+                margin: 22px 0 4px;
+            }
+
+            ol.steps {
+                counter-reset: s;
+                list-style: none;
+                padding: 0;
+                margin: 10px 0;
+            }
+
+            ol.steps li {
+                counter-increment: s;
+                position: relative;
+                padding: 8px 0 8px 42px;
+                border-bottom: 1px dashed var(--line);
+            }
+
+            ol.steps li:last-child {
+                border-bottom: 0;
+            }
+
+            ol.steps li::before {
+                content: counter(s);
+                position: absolute;
+                left: 0;
+                top: 7px;
+                width: 26px;
+                height: 26px;
+                background: var(--soft);
+                color: var(--blue);
+                border: 2px solid var(--blue);
+                border-radius: 50%;
+                font-size: 13px;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .tip,
+            .warn {
+                border-radius: 10px;
+                padding: 12px 15px;
+                margin: 14px 0;
+                font-size: 12.5px;
+            }
+
+            .tip {
+                background: #eef4fe;
+                border-left: 4px solid var(--blue);
+                color: #16365f;
+            }
+
+            .warn {
+                background: #fff4f3;
+                border-left: 4px solid #d93025;
+                color: #7a1c14;
+            }
+
+            /* ===== FIGURE / TELEFONO ===== */
+            .figs {
+                display: flex;
+                gap: 34px;
+                justify-content: center;
+                align-items: flex-start;
+                margin: 22px 0 4px;
+            }
+
+            figure {
+                margin: 0;
+                text-align: center;
+            }
+
+            .phone {
+                width: 228px;
+                padding: 9px;
+                background: #0e1116;
+                border-radius: 30px;
+                box-shadow: 0 14px 34px rgba(15, 25, 45, .22);
+                margin: 0 auto;
+            }
+
+            .phone img {
+                width: 100%;
+                display: block;
+                border-radius: 22px;
+            }
+
+            figcaption {
+                color: var(--muted);
+                font-size: 11.5px;
+                margin-top: 10px;
+                font-weight: 600;
+            }
+
+            .figs-wide {
+                page-break-inside: avoid;
+            }
+
+            .lead {
+                font-size: 14px;
+                color: #2b3543;
+            }
+
+            footer {
+                color: var(--muted);
+                font-size: 12px;
+                text-align: center;
+                border-top: 1px solid var(--line);
+                margin-top: 34px;
+                padding-top: 16px;
+            }
+
+            .toc h2 {
+                font-size: 24px;
+                font-weight: 800;
+                margin: 0 0 4px;
+            }
+
+            .toc ol {
+                list-style: none;
+                padding: 0;
+                counter-reset: t;
+                font-size: 15px;
+            }
+
+            .toc li {
+                counter-increment: t;
+                display: flex;
+                align-items: center;
+                padding: 9px 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .toc li::before {
+                content: counter(t);
+                width: 30px;
+                height: 30px;
+                flex: 0 0 30px;
+                background: var(--soft);
+                color: var(--blue);
+                border-radius: 8px;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 14px;
+            }
+
+            @page {
+                margin: 0;
+            }
+
+            .page,
+            .toc {}
+
+            /* contenuto gestisce il proprio padding */
+        </style>
+    </head>
+
+    <body>
+
+        <!-- ===== COPERTINA ===== -->
+        <section class="cover">
+            <img class="logo" src="img/serworks-icon.png" alt="logo">
+            <h1>SerMaps Driver</h1>
+            <div class="sub">Manuale d'uso</div>
+            <div class="pill">Gestione consegne &nbsp;&middot;&nbsp; Percorso ottimizzato &nbsp;&middot;&nbsp;
+                Navigazione</div>
+            <div class="meta">
+                Versione 1.0.0 &nbsp;&bull;&nbsp; Giugno 2026
+                <span class="author">Creata da Roberto Rolle</span>
+            </div>
+        </section>
+
+        <!-- ===== INDICE ===== -->
+        <div class="page toc">
+            <h2>Indice</h2>
+            <div class="sec-rule"></div>
+            <ol>
+                <li>Introduzione</li>
+                <li>Primo avvio</li>
+                <li>La schermata principale</li>
+                <li>Aggiungere le tappe</li>
+                <li>Ordinare e gestire le tappe</li>
+                <li>Stato delle consegne</li>
+                <li>Orari di consegna e arrivo stimato</li>
+                <li>Avviare la navigazione</li>
+                <li>Tema chiaro / scuro e colore app</li>
+                <li>Guida e informazioni nell'app</li>
+                <li>Suggerimenti utili</li>
+                <li>Domande frequenti e problemi</li>
+            </ol>
+        </div>
+
+        <!-- ===== 1 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">1</div>
+                <div class="sec-title">Introduzione</div>
+            </div>
+            <div class="sec-rule"></div>
+            <p class="lead"><strong>SerMaps Driver</strong> &egrave; l'app pensata per chi
+                effettua consegne o sopralluoghi con pi&ugrave; tappe nella stessa giornata.
+                Raccoglie gli indirizzi, calcola l'ordine pi&ugrave; conveniente, controlla gli
+                orari di arrivo e avvia la navigazione con Google Maps &mdash; tutto da
+                un'unica schermata.</p>
+
+            <div class="kicker">Cosa puoi fare</div>
+            <ul>
+                <li>Aggiungere indirizzi singolarmente o incollando un'intera lista.</li>
+                <li>Ottimizzare il giro partendo dalla tappa pi&ugrave; vicina a te.</li>
+                <li>Vedere distanza, tempo totale e <strong>orario di arrivo stimato</strong> per ogni tappa.</li>
+                <li>Impostare un <strong>orario limite</strong> ("entro le") con avviso di ritardo.</li>
+                <li>Segnare le consegne fatte e proseguire alla tappa successiva.</li>
+                <li>Avviare la <strong>navigazione</strong> con un tocco.</li>
+            </ul>
+
+            <div class="tip"><strong>Requisiti:</strong> uno smartphone Android con
+                connessione dati e GPS attivo. Alla prima apertura concedi il permesso di
+                <strong>posizione</strong> per centrare la mappa e ordinare le tappe.
+            </div>
+        </div>
+
+        <!-- ===== 2 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">2</div>
+                <div class="sec-title">Primo avvio</div>
+            </div>
+            <div class="sec-rule"></div>
+            <p>All'apertura compare la schermata di benvenuto animata con il logo dell'app.
+                Solo la <strong>prima volta</strong>, una breve introduzione in quattro
+                passaggi mostra come funziona l'app.</p>
+            <p>Usa <strong>Avanti</strong> per scorrere o <strong>Salta</strong> per andare
+                subito all'app. Potrai rivederla quando vuoi da
+                <strong>&#8942; &rarr; Rivedi introduzione</strong>.
+            </p>
+
+            <div class="figs figs-wide">
+                <figure>
+                    <div class="phone"><img src="img/00-splash.png" alt="Avvio"></div>
+                    <figcaption>Schermata di avvio</figcaption>
+                </figure>
+                <figure>
+                    <div class="phone"><img src="img/00-onboarding.png" alt="Introduzione"></div>
+                    <figcaption>Introduzione (primo avvio)</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ===== 3 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">3</div>
+                <div class="sec-title">La schermata principale</div>
+            </div>
+            <div class="sec-rule"></div>
+            <p>La schermata &egrave; divisa in due parti: la <strong>mappa</strong> in alto
+                e il <strong>pannello delle tappe</strong> in basso.</p>
+            <ul>
+                <li><strong>Barra di avanzamento</strong> (in alto): tappe gi&agrave;
+                    consegnate sul totale (es. <em>0/3 consegnate</em>).</li>
+                <li><strong>Mappa</strong>: percorso in blu e marcatori numerati nell'ordine di visita.</li>
+                <li><strong>Riepilogo</strong>: distanza e tempo totali (es. <em>28 km &middot; 52 min</em>).</li>
+                <li><strong>Lista tappe</strong>: indirizzo completo, distanza dalla
+                    precedente e orario di arrivo stimato.</li>
+            </ul>
+            <div class="tip">Tocca o trascina la <strong>maniglia</strong> sopra "Da fare"
+                per ingrandire la lista a tutto schermo o tornare alla mappa grande.</div>
+
+            <div class="figs">
+                <figure>
+                    <div class="phone"><img src="img/02-percorso.png" alt="Schermata principale"></div>
+                    <figcaption>Mappa, percorso e lista tappe</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ===== 4 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">4</div>
+                <div class="sec-title">Aggiungere le tappe</div>
+            </div>
+            <div class="sec-rule"></div>
+            <div class="kicker">Indirizzo singolo</div>
+            <ol class="steps">
+                <li>Tocca <strong>Aggiungi</strong>.</li>
+                <li>Inizia a scrivere l'indirizzo: compaiono i suggerimenti.</li>
+                <li>Tocca il suggerimento corretto. Se l'indirizzo &egrave; ambiguo, scegli
+                    tra i risultati trovati.</li>
+            </ol>
+            <div class="kicker">Pi&ugrave; indirizzi insieme</div>
+            <ol class="steps">
+                <li>Tocca l'icona <strong>Incolla lista</strong>.</li>
+                <li>Incolla o scrivi gli indirizzi, <strong>uno per riga</strong>.</li>
+                <li>Conferma: vengono aggiunti e geolocalizzati tutti insieme.</li>
+            </ol>
+            <div class="tip">Indirizzi pi&ugrave; precisi (via, civico, citt&agrave;) danno
+                risultati migliori ed evitano la scelta tra pi&ugrave; opzioni.</div>
+
+            <div class="figs">
+                <figure>
+                    <div class="phone"><img src="img/01-home-vuota.png" alt="Schermata iniziale"></div>
+                    <figcaption>Schermata iniziale</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ===== 5 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">5</div>
+                <div class="sec-title">Ordinare e gestire le tappe</div>
+            </div>
+            <div class="sec-rule"></div>
+            <ul>
+                <li><strong>Auto-ordina</strong>: quando attivo, riordina le tappe partendo
+                    dalla pi&ugrave; vicina a te, per evitare giri inutili.</li>
+                <li><strong>Sposta a mano</strong>: trascina una tappa con l'icona &#9776;;
+                    l'ordinamento automatico si disattiva e l'ordine resta fisso.</li>
+                <li><strong>Menu &#8942;</strong> su ogni tappa: Sposta su / gi&ugrave; / Fai
+                    per ultima, Blocca come prima / ultima, Imposta orario, Apri in Google Maps,
+                    Consegna non riuscita, Elimina.</li>
+                <li><strong>Elimina rapida</strong>: scorri la tappa verso sinistra.</li>
+                <li>Dal menu in alto: <strong>Inverti percorso</strong> e
+                    <strong>Condividi / esporta giro</strong>.
+                </li>
+            </ul>
+
+            <div class="figs">
+                <figure>
+                    <div class="phone"><img src="img/08-menu-tappa.png" alt="Menu della tappa"></div>
+                    <figcaption>Menu delle azioni su una tappa</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ===== 6 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">6</div>
+                <div class="sec-title">Stato delle consegne</div>
+            </div>
+            <div class="sec-rule"></div>
+            <ol class="steps">
+                <li>Tocca la <strong>spunta verde</strong> per segnare una tappa <strong>consegnata</strong>.</li>
+                <li>La tappa esce dalla lista, il pin diventa <strong>verde</strong> e il
+                    percorso si ricalcola sulle tappe rimaste.</li>
+                <li>Compare il pulsante <strong>PROSSIMA</strong> per navigare subito alla
+                    tappa successiva.</li>
+            </ol>
+            <p>Dal menu &#8942; puoi anche segnare una consegna come <strong>non
+                    riuscita</strong> (pin rosso). Il contatore <strong>&#10003;</strong> apre le
+                tappe completate, con possibilit&agrave; di ripristinarle.</p>
+            <div class="tip"><strong>Nota:</strong> all'interno dell'app la lista e il
+                percorso si aggiornano <strong>da soli</strong>. La navigazione in
+                <strong>Google Maps non si riavvia automaticamente</strong>: per inviarle il
+                nuovo ordine tocca di nuovo <strong>Avvia navigazione</strong> o
+                <strong>Prossima</strong>.
+            </div>
+
+            <div class="figs">
+                <figure>
+                    <div class="phone"><img src="img/05-consegnata.png" alt="Tappa consegnata"></div>
+                    <figcaption>Tappa consegnata (pin verde, 1/3)</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ===== 7 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">7</div>
+                <div class="sec-title">Orari di consegna e arrivo stimato</div>
+            </div>
+            <div class="sec-rule"></div>
+            <p>Per ogni tappa puoi indicare un <strong>orario limite</strong> entro cui consegnare.</p>
+            <ol class="steps">
+                <li>Apri il menu <strong>&#8942;</strong> della tappa.</li>
+                <li>Tocca <strong>Imposta orario "entro le"</strong>.</li>
+                <li>Scegli l'ora e conferma.</li>
+            </ol>
+            <p>L'app calcola l'<strong>orario di arrivo stimato (ETA)</strong> in base ai
+                tempi reali del percorso. Se l'arrivo previsto supera l'orario limite, la tappa
+                viene evidenziata in <strong>rosso con un avviso</strong>.</p>
+            <div class="warn"><strong>In ritardo:</strong> "entro 22:55 &middot; arrivo
+                ~23:09" in rosso significa che con l'ordine attuale arriveresti dopo l'orario
+                richiesto. Spostala pi&ugrave; in alto o usa l'ordinamento
+                <em>"Orario di consegna"</em>.
+            </div>
+
+            <div class="figs figs-wide">
+                <figure>
+                    <div class="phone"><img src="img/06-orario.png" alt="Imposta orario"></div>
+                    <figcaption>Selettore orario</figcaption>
+                </figure>
+                <figure>
+                    <div class="phone"><img src="img/07-ritardo.png" alt="Avviso di ritardo"></div>
+                    <figcaption>Avviso di ritardo</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ===== 8 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">8</div>
+                <div class="sec-title">Avviare la navigazione</div>
+            </div>
+            <div class="sec-rule"></div>
+            <ul>
+                <li><strong>Avvia navigazione</strong>: apre Google Maps e fa partire
+                    direttamente la guida lungo il giro. Con pi&ugrave; di 10 tappe, l'app avvia
+                    il primo "giro" e indica quante tappe restano per i successivi.</li>
+                <li><strong>Prossima</strong>: avvia subito la navigazione verso la prossima
+                    tappa da consegnare.</li>
+            </ul>
+            <div class="tip"><strong>Flusso consigliato sul campo:</strong> Avvia
+                navigazione &rarr; consegni &rarr; segni la tappa come consegnata &rarr;
+                <strong>Prossima</strong> (per aggiornare Google Maps), e avanti cos&igrave;
+                fino a fine giro.
+            </div>
+        </div>
+
+        <!-- ===== 9 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">9</div>
+                <div class="sec-title">Tema chiaro / scuro e colore app</div>
+            </div>
+            <div class="sec-rule"></div>
+            <p>Da <strong>&#8942; &rarr; Tema (chiaro/scuro)</strong> puoi scegliere:</p>
+            <ul>
+                <li><strong>Sistema</strong> &mdash; segue l'impostazione del telefono</li>
+                <li><strong>Chiaro</strong></li>
+                <li><strong>Scuro</strong> &mdash; ideale per la guida di sera</li>
+            </ul>
+            <p>Da <strong>&#8942; &rarr; Colore app</strong> puoi scegliere il
+                <strong>colore accento</strong> (Blu, Verde, Viola, Arancio, Rosso, Teal):
+                tinge pulsanti, pin numerati e il marcatore della tua posizione.
+            </p>
+            <p>Entrambe le scelte vengono salvate e mantenute ai successivi avvii.</p>
+        </div>
+
+        <!-- ===== 10 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">10</div>
+                <div class="sec-title">Guida e informazioni nell'app</div>
+            </div>
+            <div class="sec-rule"></div>
+            <p>Dal menu <strong>&#8942;</strong> in alto a destra trovi tutte le opzioni,
+                tra cui:</p>
+            <ul>
+                <li><strong>Guida</strong> &mdash; questo manuale, consultabile direttamente nell'app</li>
+                <li><strong>Rivedi introduzione</strong> &mdash; riapre la presentazione iniziale</li>
+                <li><strong>Informazioni</strong> &mdash; versione e autore</li>
+            </ul>
+
+            <div class="figs figs-wide">
+                <figure>
+                    <div class="phone"><img src="img/03-menu.png" alt="Menu opzioni"></div>
+                    <figcaption>Menu opzioni</figcaption>
+                </figure>
+                <figure>
+                    <div class="phone"><img src="img/04-informazioni.png" alt="Informazioni"></div>
+                    <figcaption>Informazioni</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ===== 11 ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">11</div>
+                <div class="sec-title">Suggerimenti utili</div>
+            </div>
+            <div class="sec-rule"></div>
+            <ul>
+                <li>Tieni il <strong>GPS attivo</strong>: l'ordinamento parte dalla tua posizione reale.</li>
+                <li>Per giri lunghi, segna le tappe man mano: la lista resta pulita e il
+                    percorso nell'app si ricalcola da solo (ricorda di toccare
+                    <strong>Prossima</strong> per aggiornare Google Maps).
+                </li>
+                <li>Tocca una tappa nella lista per <strong>centrarla sulla mappa</strong>.</li>
+                <li>Usa <strong>Blocca come prima/ultima</strong> per le tappe con vincoli
+                    (es. ritiro iniziale o deposito finale).</li>
+                <li><strong>Condividi giro</strong> per inviare la lista a un collega.</li>
+                <li><strong>Indirizzi in cache</strong>: quelli già cercati vengono memorizzati,
+                    così reinserirli è immediato e funziona anche <strong>offline</strong>.</li>
+                <li><strong>Annulla (UNDO)</strong>: se elimini tutte le tappe o segni una tappa
+                    per errore, compare un avviso con <strong>ANNULLA</strong> per ripristinare.</li>
+                <li><strong>Più di 10 tappe</strong>: l'app mostra <strong>"Giro 1 di N"</strong>
+                    e avvia il primo giro; completate quelle, tocca di nuovo
+                    <strong>Avvia navigazione</strong>.
+                </li>
+                <li><strong>Fine giro</strong>: vedi un <strong>riepilogo</strong> (completate,
+                    non riuscite, km e durata) e il pulsante <strong>Nuovo giro</strong>.</li>
+                <li><strong>Testo più grande</strong>: l'app rispetta l'ingrandimento testo del
+                    telefono per una migliore leggibilità.</li>
+            </ul>
+        </div>
+
+        <!-- ===== 12 FAQ ===== -->
+        <div class="page">
+            <div class="sec-head">
+                <div class="sec-num">12</div>
+                <div class="sec-title">Domande frequenti e problemi</div>
+            </div>
+            <div class="sec-rule"></div>
+
+            <div class="kicker">La mappa resta grigia</div>
+            <p>La chiave Google Maps non &egrave; configurata o non &egrave;
+                autorizzata. Verifica che nel progetto Google Cloud siano attive
+                <em>Maps SDK for Android, Geocoding, Places e Directions</em>.
+            </p>
+
+            <div class="kicker">Non trova gli indirizzi</div>
+            <p>Controlla la connessione dati. Se la ricerca d&agrave; sempre
+                errore, la chiave API potrebbe avere una <em>restrizione "App
+                    Android"</em>: per le ricerche serve impostarla su <em>"Nessuna"</em>
+                con limitazione per API. Scrivi indirizzi pi&ugrave; precisi
+                (via, civico, citt&agrave;).</p>
+
+            <div class="kicker">Le tappe non si ordinano da sole</div>
+            <p>Attiva l'interruttore <strong>Auto-ordina</strong> e assicurati che
+                il <strong>GPS</strong> sia acceso: l'ordine parte dalla tua
+                posizione. Se hai spostato una tappa a mano, l'auto-ordina si
+                disattiva apposta.</p>
+
+            <div class="kicker">Google Maps non si aggiorna quando consegno</div>
+            <p>&Egrave; normale: dentro l'app la lista si aggiorna da sola, ma la
+                navigazione in Google Maps va rilanciata toccando
+                <strong>Prossima</strong> o <strong>Avvia navigazione</strong>.
+            </p>
+
+            <div class="kicker">Ho pi&ugrave; di 10 tappe</div>
+            <p>Google Maps gestisce al massimo 10 tappe per percorso: l'app avvia
+                il primo "giro" e ti indica quante restano. Completa il primo blocco,
+                poi tocca di nuovo <strong>Avvia navigazione</strong>.</p>
+
+            <div class="kicker">Arrivo segnato in ritardo (rosso)</div>
+            <p>L'orario di arrivo stimato supera l'orario limite impostato. Sposta
+                la tappa pi&ugrave; in alto, oppure usa l'ordinamento
+                <em>"Orario di consegna"</em>.
+            </p>
+
+            <div class="kicker">L'app chiede la posizione</div>
+            <p>Concedi il permesso di <strong>posizione</strong>: serve a centrare
+                la mappa e a calcolare l'ordine delle tappe. Puoi gestirlo dalle
+                impostazioni del telefono.</p>
+
+            <div class="tip">Vuoi rivedere come funziona? Apri
+                <strong>&#8942; &rarr; Guida</strong> oppure
+                <strong>&#8942; &rarr; Rivedi introduzione</strong> direttamente
+                nell'app.
+            </div>
+
+            <footer>
+                SerMaps Driver &mdash; Manuale d'uso v1.0.0<br>
+                <strong>App e guida realizzate da Roberto Rolle</strong>
+            </footer>
+        </div>
+
+    </body>
+
+</html>
