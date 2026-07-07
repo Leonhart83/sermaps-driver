@@ -3,6 +3,11 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.4
+
+- Correzione: dopo aver aggiornato, l'app non richiede più di nuovo lo stesso
+  aggiornamento. L'avviso ricompare solo quando esce una versione più nuova.
+
 ## v1.1.3
 
 - Orari dei punti vendita: per ogni tappa puoi indicare apertura, chiusura ed

@@ -174,11 +174,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+    // Ricorda che questa versione è già stata proposta: non richiederla più a
+    // ogni avvio (né dopo un aggiornamento, né dopo un "Più tardi").
+    // Se in futuro esce una versione più nuova, l'avviso ricompare.
+    await StorageService.setSkippedUpdateVersion(info.version);
     if (confirm == true && mounted) {
       await _downloadAndInstall(info);
-    } else {
-      // "Più tardi": non richiedere più questa stessa versione.
-      await StorageService.setSkippedUpdateVersion(info.version);
     }
   }
 
