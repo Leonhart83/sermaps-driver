@@ -5,7 +5,9 @@ import 'package:flutter/services.dart' show rootBundle, HapticFeedback;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ota_update/ota_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
 import '../main.dart'
@@ -45,6 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Position? _position;
   bool _busy = false;
   String? _statusMessage;
+
+  /// Versione dell'app (es. "1.1.5"), caricata all'avvio per la schermata
+  /// "Informazioni".
+  String _appVersion = '';
 
   /// Timer che forza la chiusura della SnackBar corrente, anche quando sul
   /// dispositivo e attivo uno screen reader (in quel caso Flutter le terrebbe
@@ -111,6 +117,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _init() async {
+    final pkg = await PackageInfo.fromPlatform();
+    if (mounted) setState(() => _appVersion = pkg.version);
     _mapStyleLight = await rootBundle.loadString('assets/map/light.json');
     _mapStyleDark = await rootBundle.loadString('assets/map/dark.json');
     final saved = await StorageService.loadStops();
@@ -167,6 +175,13 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Più tardi'),
           ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx, false);
+              _openReleasesPage();
+            },
+            child: const Text('Scarica dal sito'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Aggiorna ora'),
@@ -180,6 +195,17 @@ class _HomeScreenState extends State<HomeScreen> {
     await StorageService.setSkippedUpdateVersion(info.version);
     if (confirm == true && mounted) {
       await _downloadAndInstall(info);
+    }
+  }
+
+  /// Apre la pagina delle release su GitHub (fallback allo scaricamento manuale).
+  Future<void> _openReleasesPage() async {
+    if (!AppConfig.hasGithubRepo) return;
+    final uri = Uri.parse(
+      'https://github.com/${AppConfig.githubRepo}/releases/latest',
+    );
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -217,23 +243,39 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (event.status != OtaStatus.DOWNLOADING) {
             if (mounted) {
               Navigator.of(context, rootNavigator: true).pop();
-              _showSnack('Aggiornamento non riuscito. Riprova più tardi.');
+              _showUpdateFailed();
             }
           }
         },
         onError: (_) {
           if (mounted) {
             Navigator.of(context, rootNavigator: true).pop();
-            _showSnack('Aggiornamento non riuscito. Riprova più tardi.');
+            _showUpdateFailed();
           }
         },
       );
     } catch (_) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
-        _showSnack('Impossibile avviare l\'aggiornamento.');
+        _showUpdateFailed();
       }
     }
+  }
+
+  /// Notifica di aggiornamento fallito con azione per scaricare dal sito.
+  void _showUpdateFailed() {
+    if (!mounted) return;
+    _presentSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 8),
+        content: const Text('Aggiornamento non riuscito.'),
+        action: SnackBarAction(
+          label: 'SCARICA DAL SITO',
+          onPressed: _openReleasesPage,
+        ),
+      ),
+    );
   }
 
   // --------------------------------------------------------------- Posizione
@@ -944,7 +986,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 2),
-            Text('Versione 1.0.0',
+            Text('Versione ${_appVersion.isEmpty ? '—' : _appVersion}',
                 style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
             const SizedBox(height: 16),
             Text('Creata da',

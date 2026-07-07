@@ -5,7 +5,7 @@
 ///    (MAPS_API_KEY) e iniettata nel Manifest.
 /// 2) Per le chiamate HTTP (Geocoding / Directions) -> usata qui sotto.
 ///
-/// Puoi passare la chiave senza scriverla nel codice usando:
+/// Posso passare la chiave senza scriverla nel codice usando:
 ///   flutter run --dart-define=MAPS_API_KEY=LA_TUA_CHIAVE
 /// oppure incollarla direttamente nel valore di default qui sotto.
 class AppConfig {

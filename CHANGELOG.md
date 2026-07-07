@@ -3,6 +3,14 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.5
+
+- La schermata "Informazioni" mostra ora la versione reale dell'app.
+- L'avviso di aggiornamento ha un pulsante "Scarica dal sito" e, se il download
+  automatico fallisce, propone il download manuale dalla pagina release.
+- Mappa in tema scuro più leggibile (strade e autostrade più contrastate).
+- Migliorie interne e test automatici sulla logica di orari e ordinamento.
+
 ## v1.1.4
 
 - Correzione: dopo aver aggiornato, l'app non richiede più di nuovo lo stesso
