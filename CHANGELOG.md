@@ -5,39 +5,17 @@ automaticamente come descrizione della Release su GitHub.
 
 ## v1.1.11
 
-- Correzione: nel foglio "Dettagli intervento" i pulsanti "Salta" e "Conferma"
-  non finiscono più dietro la barra di navigazione di sistema (aggiunto margine
-  di sicurezza) e sono più alti, quindi più visibili e facili da toccare.
-
-## v1.1.9
-
-- Quando è disponibile un aggiornamento, l'app richiede il permesso "Installa
-  app sconosciute" (aprendo la schermata di sistema) se non è ancora concesso,
-  così l'installazione automatica può completarsi. Una volta concesso, gli
-  aggiornamenti si installano da soli senza altre richieste.
-
-## v1.1.8
-
-- Correzione: l'aggiornamento automatico viene ora tentato una sola volta per
-  versione. Se l'installazione non viene completata (prompt di sistema annullato
-  o permesso "installa app sconosciute" non concesso) l'app non riprova a ogni
-  avvio, eliminando il loop di aggiornamento. Resta il download manuale dal sito.
-
-## v1.1.7
-
-- Correzione del numero di build (versionCode) generato dalla pipeline: ora è
-  ricavato dalla versione ed è sempre crescente, evitando che un aggiornamento
-  venga rifiutato da Android come "downgrade".
-
-## v1.1.6
-
-- Correzione dettatura vocale: la lingua italiana viene ora scelta tra quelle
-  effettivamente disponibili sul dispositivo e gli eventuali errori del
-  microfono vengono mostrati a schermo.
+- Dettatura vocale degli indirizzi corretta: la lingua italiana viene scelta tra
+  quelle disponibili sul dispositivo e gli eventuali errori del microfono
+  vengono mostrati a schermo.
 - La schermata iniziale (splash) mostra la versione reale dell'app.
-- Aggiornamento automatico: quando è disponibile una versione più recente su
-  GitHub, viene scaricata e installata all'avvio senza chiedere conferma.
-- La versione di app e guida viene allineata automaticamente a ogni release.
+- Aggiornamento automatico da GitHub: all'avvio l'app scarica e installa da sola
+  la versione più recente, senza loop. Se necessario chiede una volta il permesso
+  "Installa app sconosciute"; una volta concesso gli aggiornamenti sono
+  completamente automatici.
+- Nel foglio "Dettagli intervento" i pulsanti "Salta" e "Conferma" non finiscono
+  più dietro la barra di navigazione di sistema e sono più alti, quindi più
+  visibili e facili da toccare.
 
 ## v1.1.5
 
