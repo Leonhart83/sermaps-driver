@@ -145,10 +145,20 @@ class _HomeScreenState extends State<HomeScreen> {
   /// recente, la scarica e installa automaticamente all'avvio, senza chiedere
   /// conferma. (Il prompt finale di installazione è quello di sistema Android
   /// e non può essere evitato.)
+  ///
+  /// L'aggiornamento automatico viene tentato UNA sola volta per versione: se
+  /// l'installazione non viene completata (prompt di sistema annullato, permesso
+  /// "installa app sconosciute" non concesso, ecc.) l'app non riprova a ogni
+  /// avvio, evitando il loop. Resta comunque il download manuale dal sito.
   Future<void> _checkForUpdate() async {
     final info = await UpdateService.checkForUpdate();
     if (!mounted || info == null) return;
-    // Versione più recente trovata: avvia subito il download automatico.
+    // Evita il loop: non ritentare la stessa versione già gestita in automatico.
+    final handled = await StorageService.getSkippedUpdateVersion();
+    if (!mounted || handled == info.version) return;
+    // Segna la versione come già tentata PRIMA del download/installazione.
+    await StorageService.setSkippedUpdateVersion(info.version);
+    if (!mounted) return;
     _showSnack('Aggiornamento ${info.version}: download in corso…');
     await _downloadAndInstall(info);
   }

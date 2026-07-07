@@ -3,6 +3,13 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.8
+
+- Correzione: l'aggiornamento automatico viene ora tentato una sola volta per
+  versione. Se l'installazione non viene completata (prompt di sistema annullato
+  o permesso "installa app sconosciute" non concesso) l'app non riprova a ogni
+  avvio, eliminando il loop di aggiornamento. Resta il download manuale dal sito.
+
 ## v1.1.7
 
 - Correzione del numero di build (versionCode) generato dalla pipeline: ora è
