@@ -86,3 +86,17 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
+
+// Dopo una build release, copia l'APK nella cartella principale del progetto
+// come "SerMaps-Driver.apk", cosi e sempre facile da trovare e distribuire.
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    doLast {
+        val apk = layout.buildDirectory
+            .file("outputs/flutter-apk/app-release.apk").get().asFile
+        if (apk.exists()) {
+            val dest = rootProject.projectDir.parentFile.resolve("SerMaps-Driver.apk")
+            apk.copyTo(dest, overwrite = true)
+            println("APK copiato in: ${dest.absolutePath}")
+        }
+    }
+}

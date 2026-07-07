@@ -46,3 +46,6 @@ app.*.map.json
 
 # APK locali (le release vanno su GitHub Releases)
 /dist/
+
+# APK copiato automaticamente nella cartella del progetto
+/SerMaps-Driver.apk
