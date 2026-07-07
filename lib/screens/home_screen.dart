@@ -1816,7 +1816,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context, constraints) {
                 final mapH = _mapCollapsed
                     ? 130.0
-                    : constraints.maxHeight * 0.44;
+                    : constraints.maxHeight * 0.38;
                 return Column(
                   children: [
                     AnimatedContainer(

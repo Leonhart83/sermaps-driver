@@ -3,6 +3,11 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.12
+
+- Il pannello delle tappe si apre di più (la mappa occupa meno spazio), così
+  l'elenco delle tappe è più leggibile.
+
 ## v1.1.11
 
 - Dettatura vocale degli indirizzi corretta: la lingua italiana viene scelta tra
