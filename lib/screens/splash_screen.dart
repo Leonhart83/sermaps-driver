@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../main.dart' show kBrandCopper;
 import 'home_screen.dart';
@@ -24,9 +25,13 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _bottomFade;
   Timer? _timer;
 
+  /// Versione reale dell'app (es. "1.1.5"), caricata da PackageInfo.
+  String _version = '';
+
   @override
   void initState() {
     super.initState();
+    _loadVersion();
     _c = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1600),
@@ -52,6 +57,16 @@ class _SplashScreenState extends State<SplashScreen>
     _c.forward();
 
     _timer = Timer(const Duration(milliseconds: 2400), _goNext);
+  }
+
+  /// Carica la versione dell'app da mostrare nella splash.
+  Future<void> _loadVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) setState(() => _version = info.version);
+    } catch (_) {
+      // In caso di errore lascia il campo vuoto: la splash resta comunque valida.
+    }
   }
 
   void _goNext() {
@@ -159,7 +174,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 22),
                     Text(
-                      'Versione 1.0.0',
+                      _version.isEmpty ? '' : 'Versione $_version',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.55),
                         fontSize: 12,

@@ -141,61 +141,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _checkForUpdate();
   }
 
-  /// Verifica gli aggiornamenti su GitHub e, se disponibili, propone di
-  /// scaricarli e installarli.
+  /// Verifica gli aggiornamenti su GitHub e, se è disponibile una versione più
+  /// recente, la scarica e installa automaticamente all'avvio, senza chiedere
+  /// conferma. (Il prompt finale di installazione è quello di sistema Android
+  /// e non può essere evitato.)
   Future<void> _checkForUpdate() async {
     final info = await UpdateService.checkForUpdate();
     if (!mounted || info == null) return;
-    // Non richiedere di nuovo una versione che l'utente ha già rimandato.
-    final skipped = await StorageService.getSkippedUpdateVersion();
-    if (!mounted || skipped == info.version) return;
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.system_update, size: 32),
-        title: const Text('Aggiornamento disponibile'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('È disponibile la versione ${info.version}.'),
-            if (info.notes != null && info.notes!.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                info.notes!,
-                maxLines: 6,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 13),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Più tardi'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx, false);
-              _openReleasesPage();
-            },
-            child: const Text('Scarica dal sito'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Aggiorna ora'),
-          ),
-        ],
-      ),
-    );
-    // Ricorda che questa versione è già stata proposta: non richiederla più a
-    // ogni avvio (né dopo un aggiornamento, né dopo un "Più tardi").
-    // Se in futuro esce una versione più nuova, l'avviso ricompare.
-    await StorageService.setSkippedUpdateVersion(info.version);
-    if (confirm == true && mounted) {
-      await _downloadAndInstall(info);
-    }
+    // Versione più recente trovata: avvia subito il download automatico.
+    _showSnack('Aggiornamento ${info.version}: download in corso…');
+    await _downloadAndInstall(info);
   }
 
   /// Apre la pagina delle release su GitHub (fallback allo scaricamento manuale).

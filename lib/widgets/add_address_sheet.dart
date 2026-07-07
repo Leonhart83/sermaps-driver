@@ -27,6 +27,10 @@ class _AddAddressSheetState extends State<AddAddressSheet>
   bool _speechAvailable = false;
   bool _listening = false;
 
+  /// Locale effettivamente usato per la dettatura (scelto tra quelli
+  /// disponibili sul dispositivo; l'italiano potrebbe non essere it_IT).
+  String? _speechLocaleId;
+
   /// Animazione "pulsante" mostrata mentre il microfono ascolta.
   late final AnimationController _pulse;
 
@@ -102,14 +106,46 @@ class _AddAddressSheetState extends State<AddAddressSheet>
             setState(() => _listening = false);
           }
         },
-        onError: (_) {
-          if (mounted) setState(() => _listening = false);
+        onError: (error) {
+          if (!mounted) return;
+          setState(() => _listening = false);
+          // Ignora i "non ho capito" (silenzio o nessuna corrispondenza):
+          // non sono errori bloccanti e comparirebbero di continuo.
+          final msg = error.errorMsg;
+          if (msg == 'error_no_match' || msg == 'error_speech_timeout') return;
+          _showSpeechError('Errore riconoscimento vocale: $msg');
         },
       );
+      // Sceglie la migliore lingua italiana tra quelle installate sul
+      // dispositivo: su molti telefoni l'id non e' esattamente "it_IT".
+      if (available) {
+        try {
+          final locales = await _speech.locales();
+          final it = locales.firstWhere(
+            (l) => l.localeId.toLowerCase().replaceAll('-', '_').startsWith('it'),
+            orElse: () => locales.isNotEmpty
+                ? locales.first
+                : throw StateError('no-locales'),
+          );
+          _speechLocaleId = it.localeId;
+        } catch (_) {
+          _speechLocaleId = null; // usa il default di sistema
+        }
+      }
       if (mounted) setState(() => _speechAvailable = available);
-    } catch (_) {
+    } catch (e) {
       if (mounted) setState(() => _speechAvailable = false);
+      _showSpeechError('Impossibile avviare il microfono: $e');
     }
+  }
+
+  /// Mostra un messaggio d'errore del riconoscimento vocale (se il widget
+  /// e' ancora montato).
+  void _showSpeechError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   Future<void> _toggleListening() async {
@@ -129,8 +165,9 @@ class _AddAddressSheetState extends State<AddAddressSheet>
     setState(() => _listening = true);
     await _speech.listen(
       listenOptions: SpeechListenOptions(
-        localeId: 'it_IT',
+        localeId: _speechLocaleId,
         listenMode: ListenMode.dictation,
+        partialResults: true,
         cancelOnError: true,
         listenFor: const Duration(seconds: 30),
         pauseFor: const Duration(seconds: 4),

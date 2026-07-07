@@ -3,6 +3,16 @@
 Le note di ogni versione. La sezione della versione taggata viene usata
 automaticamente come descrizione della Release su GitHub.
 
+## v1.1.6
+
+- Correzione dettatura vocale: la lingua italiana viene ora scelta tra quelle
+  effettivamente disponibili sul dispositivo e gli eventuali errori del
+  microfono vengono mostrati a schermo.
+- La schermata iniziale (splash) mostra la versione reale dell'app.
+- Aggiornamento automatico: quando è disponibile una versione più recente su
+  GitHub, viene scaricata e installata all'avvio senza chiedere conferma.
+- La versione di app e guida viene allineata automaticamente a ogni release.
+
 ## v1.1.5
 
 - La schermata "Informazioni" mostra ora la versione reale dell'app.
